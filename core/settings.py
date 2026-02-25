@@ -135,3 +135,7 @@ CORS_ALLOWED_ORIGINS = [
 
 # Optional: If you plan to send credentials (like cookies or authorization headers) from React
 CORS_ALLOW_CREDENTIALS = True
+
+
+# --- CUSTOM USER MODEL ---
+AUTH_USER_MODEL = 'events.User'

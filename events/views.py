@@ -1,9 +1,236 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, views, permissions, status
+from rest_framework.response import Response
+from django.contrib.auth import authenticate
+from django.conf import settings
+from rest_framework_simplejwt.tokens import RefreshToken
+import requests
+import threading
 from .models import User, Sponsor, Event, Speaker, Attendee
 from .serializers import (
     UserSerializer, SponsorSerializer, EventSerializer, 
-    SpeakerSerializer, AttendeeSerializer
+    SpeakerSerializer, AttendeeSerializer,
+    UserRegistrationSerializer, OTPVerifySerializer, LoginRequestSerializer,
+    PasswordResetRequestSerializer, PasswordResetConfirmSerializer
 )
+
+def send_email_async(subject, message, recipient_list):
+    """Sends email via Resend API instead of SMTP"""
+    url = "https://api.resend.com/emails"
+    headers = {
+        "Authorization": f"Bearer {settings.RESEND_API_KEY}",
+        "Content-Type": "application/json"
+    }
+    sender_email = settings.DEFAULT_FROM_EMAIL or "onboarding@resend.dev"
+    data = {
+        "from": sender_email,
+        "to": recipient_list,
+        "subject": subject,
+        "html": message
+    }
+    
+    try:
+        response = requests.post(url, json=data, headers=headers)
+        if response.status_code == 200:
+            print(f"✅ Email sent via Resend from: {sender_email}")
+        else:
+            print(f"❌ Resend Error: {response.text}")
+    except Exception as e:
+        print(f"❌ Background API Error: {e}")
+
+# ... keep the rest of your send_otp_email and Threading logic the same ...
+
+def send_otp_email(user, otp_code, subject_prefix="Account"):
+    """
+    Triggers an asynchronous email thread.
+    This prevents 'CRITICAL WORKER TIMEOUT' on Render.
+    """
+    subject = f'{subject_prefix} Verification Code'
+    
+    # Beautified HTML Message
+    message = f"""
+    <div style="font-family: Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px; background-color: #ffffff;">
+        <div style="text-align: center; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 20px;">
+            <h2 style="color: #2c3e50; margin: 0;">Doctor Search</h2>
+        </div>
+        <div style="text-align: center;">
+            <p style="font-size: 16px; color: #555;">Hello <strong>{user.username}</strong>,</p>
+            <p style="font-size: 16px; color: #555;">Use the verification code below to complete your request:</p>
+            
+            <div style="background-color: #f8f9fa; border: 1px dashed #007bff; padding: 15px; margin: 20px auto; width: fit-content; border-radius: 5px;">
+                <span style="font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #007bff;">{otp_code}</span>
+            </div>
+            
+            <p style="font-size: 14px; color: #777;">This code is valid for <strong>10 minutes</strong>.</p>
+            <p style="font-size: 14px; color: #999; margin-top: 30px;">If you did not request this, please ignore this email.</p>
+        </div>
+        <div style="text-align: center; margin-top: 20px; font-size: 12px; color: #aaa; border-top: 1px solid #eee; padding-top: 10px;">
+            &copy; Doctor Search App
+        </div>
+    </div>
+    """
+
+    recipient_list = [user.email]
+    
+    # Start the thread
+    thread = threading.Thread(
+        target=send_email_async, 
+        args=(subject, message, recipient_list)
+    )
+    thread.start()
+
+# ===========================
+# AUTH VIEWS
+# ===========================
+
+class RegisterView(views.APIView):
+    """Step 1: Create Account (Inactive) -> Send OTP Email via Thread"""
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        serializer = UserRegistrationSerializer(data=request.data)
+        if serializer.is_valid():
+            user = User.objects.create_user(
+                username=serializer.validated_data['username'],
+                email=serializer.validated_data['email'],
+                password=serializer.validated_data['password']
+            )
+            user.is_active = False 
+            user.save()
+
+            # Generate OTP
+            otp = user.generate_otp()
+            
+            # This is now non-blocking (Fast response)
+            send_otp_email(user, otp, subject_prefix="Activate")
+
+            return Response({
+                "message": "Account created. OTP sent to email.",
+                "username": user.username
+            }, status=status.HTTP_201_CREATED)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class VerifyEmailView(views.APIView):
+    """Step 2: Verify OTP -> Activate Account -> Auto Login"""
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        serializer = OTPVerifySerializer(data=request.data)
+        if serializer.is_valid():
+            username = serializer.validated_data['username']
+            otp_input = serializer.validated_data['otp']
+
+            try:
+                user = User.objects.get(username=username)
+            except User.DoesNotExist:
+                return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+
+            if user.verify_otp(otp_input):
+                user.is_active = True
+                user.is_email_verified = True
+                user.otp_code = None 
+                user.save()
+
+                refresh = RefreshToken.for_user(user)
+
+                return Response({
+                    "message": "Email verified successfully!",
+                    "refresh": str(refresh),
+                    "access": str(refresh.access_token),
+                    "user_id": user.id,
+                    "username": user.username
+                }, status=status.HTTP_200_OK)
+            
+            return Response({"error": "Invalid or expired OTP"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class LoginView(views.APIView):
+    """Standard Login"""
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        serializer = LoginRequestSerializer(data=request.data)
+        if serializer.is_valid():
+            username = serializer.validated_data['username']
+            password = serializer.validated_data['password']
+
+            # Allow login with Email
+            if '@' in username:
+                try:
+                    # Use __iexact for case-insensitive lookup
+                    user_obj = User.objects.get(email__iexact=username)
+                    username = user_obj.username
+                except User.DoesNotExist:
+                    print(f"Login Warning: No user found for email '{username}'")
+                    pass 
+
+            user = authenticate(username=username, password=password)
+
+            if user:
+                if not user.is_active:
+                    return Response({"error": "Account is not verified."}, status=status.HTTP_403_FORBIDDEN)
+                
+                refresh = RefreshToken.for_user(user)
+                return Response({
+                    'refresh': str(refresh),
+                    'access': str(refresh.access_token),
+                    'user_id': user.id,
+                    'username': user.username
+                }, status=status.HTTP_200_OK)
+            
+            return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# ===========================
+# PASSWORD RESET VIEWS
+# ===========================
+
+class PasswordResetRequestView(views.APIView):
+    """Step 1 of Reset: Send OTP to Email via Thread"""
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        serializer = PasswordResetRequestSerializer(data=request.data)
+        if serializer.is_valid():
+            email = serializer.validated_data['email']
+            try:
+                user = User.objects.get(email__iexact=email)
+                otp = user.generate_otp()
+                # Fast response, background email
+                send_otp_email(user, otp, subject_prefix="Password Reset")
+            except User.DoesNotExist:
+                pass
+            
+            return Response({"message": "If an account exists, an OTP has been sent."}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class PasswordResetConfirmView(views.APIView):
+    """Step 2 of Reset: Verify OTP -> Change Password"""
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        serializer = PasswordResetConfirmSerializer(data=request.data)
+        if serializer.is_valid():
+            email = serializer.validated_data['email']
+            otp = serializer.validated_data['otp']
+            new_password = serializer.validated_data['new_password']
+
+            try:
+                user = User.objects.get(email__iexact=email)
+                if user.verify_otp(otp):
+                    user.set_password(new_password)
+                    user.otp_code = None
+                    user.is_active = True
+                    user.is_email_verified = True
+                    user.save()
+                    return Response({"message": "Password reset successful."}, status=status.HTTP_200_OK)
+                else:
+                    return Response({"error": "Invalid or expired OTP"}, status=status.HTTP_400_BAD_REQUEST)
+            except User.DoesNotExist:
+                return Response({"error": "Invalid request"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
