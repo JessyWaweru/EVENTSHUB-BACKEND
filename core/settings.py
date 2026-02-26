@@ -24,7 +24,11 @@ SECRET_KEY = 'django-insecure-hz8wlvk^=nsjp8aobg1n%3cpv+4xx_*$1g%%uywx0j7hm!(7h=
 
 # Clerk Secret Key
 # Get this from your Clerk Dashboard -> API Keys -> Secret Keys
-CLERK_SECRET_KEY = 'pk_test_Y3VycmVudC10aHJ1c2gtMS5jbGVyay5hY2NvdW50cy5kZXYk'
+CLERK_SECRET_KEY = 'sk_test_rYwaWKLhneZjY4XppYaAt1xu164yPB4iwHoAZZdIJ2' # Make sure this is your actual secret key
+
+# Clerk JWKS URL
+# Get this from your Clerk Dashboard -> API Keys -> Advanced
+CLERK_JWKS_URL = 'https://current-thrush-1.clerk.accounts.dev/.well-known/jwks.json'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -152,3 +156,11 @@ CORS_ALLOW_CREDENTIALS = True
 
 # --- CUSTOM USER MODEL ---
 AUTH_USER_MODEL = 'events.User'
+
+# --- CACHE SETTINGS ---
+# Used by ClerkAuthentication to cache JWKS
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+    }
+}

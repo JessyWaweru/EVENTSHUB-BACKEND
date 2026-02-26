@@ -7,6 +7,7 @@ import json
 from rest_framework.authentication import BaseAuthentication
 from rest_framework.exceptions import AuthenticationFailed
 from django.conf import settings
+from django.core.cache import cache
 from .models import User
 from jwt.algorithms import RSAAlgorithm
 
@@ -24,13 +25,16 @@ class ClerkAuthentication(BaseAuthentication):
         token = auth_header.split(' ')[1]
 
         try:
-            # 1. Fetch JWKS from Clerk to verify the token signature
-            # Note: In production, you should cache this result to avoid an API call on every request.
-            jwks_url = 'https://api.clerk.com/v1/jwks'
-            headers = {'Authorization': f'Bearer {settings.CLERK_SECRET_KEY}'}
-            jwks_response = requests.get(jwks_url, headers=headers)
-            jwks_response.raise_for_status()
-            jwks_data = jwks_response.json()
+            # 1. Fetch JWKS from Clerk, with caching.
+            jwks = cache.get('clerk_jwks')
+            if not jwks:
+                jwks_url = settings.CLERK_JWKS_URL
+                # The JWKS endpoint is public and does not require authorization.
+                jwks_response = requests.get(jwks_url, timeout=10)
+                jwks_response.raise_for_status()
+                jwks = jwks_response.json()
+                # Cache the keys for 1 hour.
+                cache.set('clerk_jwks', jwks, 60 * 60)
 
             # 2. Decode the token header to find the Key ID (kid)
             unverified_header = jwt.get_unverified_header(token)
@@ -38,7 +42,7 @@ class ClerkAuthentication(BaseAuthentication):
 
             # 3. Find the correct public key
             public_key = None
-            for key in jwks_data['keys']:
+            for key in jwks['keys']:
                 if key['kid'] == kid:
                     public_key = RSAAlgorithm.from_jwk(json.dumps(key))
                     break
@@ -66,7 +70,7 @@ class ClerkAuthentication(BaseAuthentication):
                 # Fetch user details from Clerk Backend API
                 user_url = f'https://api.clerk.com/v1/users/{clerk_user_id}'
                 headers = {'Authorization': f'Bearer {settings.CLERK_SECRET_KEY}'}
-                user_response = requests.get(user_url, headers=headers)
+                user_response = requests.get(user_url, headers=headers, timeout=10)
                 user_response.raise_for_status()
                 clerk_user = user_response.json()
 
