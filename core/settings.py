@@ -22,12 +22,25 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-hz8wlvk^=nsjp8aobg1n%3cpv+4xx_*$1g%%uywx0j7hm!(7h='
 
+# Clerk Secret Key
+# Get this from your Clerk Dashboard -> API Keys -> Secret Keys
+CLERK_SECRET_KEY = 'pk_test_Y3VycmVudC10aHJ1c2gtMS5jbGVyay5hY2NvdW50cy5kZXYk'
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = []
 
 
+# Django REST Framework Settings
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'events.authentication.ClerkAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ]
+}
 # Application definition
 
 INSTALLED_APPS = [

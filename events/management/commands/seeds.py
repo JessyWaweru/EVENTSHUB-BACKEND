@@ -19,10 +19,10 @@ class Command(BaseCommand):
         User.objects.all().delete()
 
         # Create user
-        user = User.objects.create(
+        user = User.objects.create_user(
             username="user",
-            password_digest="password", # Note: in a real Django app, use make_password()
             email="user@mail.com",
+            password="password",
             gender="Female",
             age=18
         )
@@ -82,8 +82,8 @@ class Command(BaseCommand):
         )
 
         # Create Attendees (Simulating other users since the schema requested user_ids 2 and 3)
-        user2 = User.objects.create(username="david", email="david@mail.com", password_digest="pass", age=25, gender="Male")
-        user3 = User.objects.create(username="jenny", email="jenny@mail.com", password_digest="pass", age=22, gender="Female")
+        user2 = User.objects.create_user(username="david", email="david@mail.com", password="password", age=25, gender="Male")
+        user3 = User.objects.create_user(username="jenny", email="jenny@mail.com", password="password", age=22, gender="Female")
 
         Attendee.objects.create(name="Samantha Lee", email="samanthalee@example.com", user=user, event=created_events[2])
         Attendee.objects.create(name="David Kim", email="davidkim@example.com", user=user2, event=created_events[0])

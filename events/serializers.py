@@ -3,41 +3,11 @@ from .models import User, Sponsor, Event, Speaker, Attendee
 
 
 # ===========================
-# AUTH SERIALIZERS
+# MODEL SERIALIZERS
 # ===========================
-
-class UserRegistrationSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True)
-
-    class Meta:
-        model = User
-        fields = ['username', 'email', 'password', 'age']
-
-    def create(self, validated_data):
-        # Use create_user to handle password hashing automatically
-        user = User.objects.create_user(
-            username=validated_data['username'],
-            email=validated_data['email'],
-            password=validated_data['password'],
-            age=validated_data.get('age')
-        )
-        return user
-
-class LoginRequestSerializer(serializers.Serializer):
-    username = serializers.CharField()
-    password = serializers.CharField(write_only=True)
-
-class OTPVerifySerializer(serializers.Serializer):
-    username = serializers.CharField()
-    otp = serializers.CharField(max_length=6)
-
-class PasswordResetRequestSerializer(serializers.Serializer):
-    email = serializers.EmailField()
-
-class PasswordResetConfirmSerializer(serializers.Serializer):
-    email = serializers.EmailField()
-    otp = serializers.CharField(max_length=6)
-    new_password = serializers.CharField(write_only=True)
+# The previous authentication-related serializers (UserRegistrationSerializer,
+# LoginRequestSerializer, etc.) have been removed as Clerk now handles
+# user registration and login on the frontend.
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
