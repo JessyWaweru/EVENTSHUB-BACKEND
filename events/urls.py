@@ -1,7 +1,7 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import (
-    UserViewSet, SponsorViewSet, EventViewSet, SpeakerViewSet, AttendeeViewSet
+    KenyaBuzzMoviesView, UserViewSet, SponsorViewSet, EventViewSet, SpeakerViewSet, AttendeeViewSet
 )
 
 # Create a router and register our viewsets with it.
@@ -18,4 +18,5 @@ urlpatterns = [
     # All CRUD endpoints are now under the router.
     # e.g., /api/users/, /api/events/, etc.
     path('', include(router.urls)),
+    path('movies/', KenyaBuzzMoviesView.as_view(), name='movie-showtimes'),
 ]
