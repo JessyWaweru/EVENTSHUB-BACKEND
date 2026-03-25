@@ -61,7 +61,7 @@ class Command(BaseCommand):
                 "location": "DNM EVENTS PARK, Nairobi",
                 "age_limit": "22+",
                 "capacity": 5000, 
-                "date": fake.date_time_between(start_date='now', end_date='+5d', tzinfo=timezone.utc),
+                "date": fake.date_time_between(start_date='now', end_date='+500d', tzinfo=timezone.utc),
                 "sponsor": sponsor2
             },
             {
@@ -125,7 +125,7 @@ class Command(BaseCommand):
                 "location": "Sarit Center,Nairobi", 
                 "age_limit": "18+", 
                 "capacity": 510,
-                "date": fake.date_time_between(start_date='now', end_date='+50d', tzinfo=timezone.utc),
+                "date": fake.date_time_between(start_date='now', end_date='+500d', tzinfo=timezone.utc),
                 "sponsor": sponsor2
             },
             {
@@ -138,7 +138,7 @@ class Command(BaseCommand):
                 "age_limit": "18+", 
                 "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F502451239%2F545458234983%2F1%2Foriginal.20230427-155313?w=940&auto=format%2Ccompress&q=75&sharp=10&rect=0%2C0%2C3000%2C1500&s=66b44a9655179da3c31b60014dfa3f6c",
                 "capacity": 200,
-                "date": fake.date_time_between(start_date='now', end_date='+50d', tzinfo=timezone.utc),
+                "date": fake.date_time_between(start_date='now', end_date='+150d', tzinfo=timezone.utc),
                 "sponsor": sponsor2
             },
             {
@@ -151,7 +151,7 @@ class Command(BaseCommand):
                 "age_limit": "18+", 
                 "image": "https://media.istockphoto.com/id/1484313578/photo/cyber-security-network-data-protection-privacy-concept.jpg?s=612x612&w=0&k=20&c=mBkwneErmbHd7s8xauDNU-uXitNSXXBtxJ7C9He0Y9s=",
                 "capacity": 100,
-                "date": fake.date_time_between(start_date='now', end_date='+5d', tzinfo=timezone.utc),
+                "date": fake.date_time_between(start_date='now', end_date='+115d', tzinfo=timezone.utc),
                 "sponsor": sponsor2
             },
             {
@@ -164,7 +164,7 @@ class Command(BaseCommand):
                 "age_limit": "15+", 
                 "image": "https://media.istockphoto.com/id/2148803754/photo/old-used-books-hardback-books-close-up.jpg?s=612x612&w=0&k=20&c=JuhjNB48DfMbX_P7GUl43EwxgadywFNgqpbXpUQsvdE=",
                 "capacity": 30,
-                "date": fake.date_time_between(start_date='now', end_date='+50d', tzinfo=timezone.utc),
+                "date": fake.date_time_between(start_date='now', end_date='+500d', tzinfo=timezone.utc),
                 "sponsor": sponsor2
             },
             {
@@ -177,7 +177,7 @@ class Command(BaseCommand):
                 "age_limit": "21+",
                 "image": "https://media.istockphoto.com/id/1304697797/photo/african-american-man-presenting-at-medical-seminar.jpg?s=612x612&w=0&k=20&c=93V-E8ov0-6_fBNZ-iQKAGRmRWqM2Tqtf76R-vn7wEE=",
                 "capacity": 500,
-                "date": fake.date_time_between(start_date='now', end_date='+5d', tzinfo=timezone.utc),
+                "date": fake.date_time_between(start_date='now', end_date='+115d', tzinfo=timezone.utc),
                 "sponsor": sponsor2
             },
             {
@@ -190,7 +190,7 @@ class Command(BaseCommand):
                 "age_limit": "16+",
                 "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F423964689%2F1347219007203%2F1%2Flogo.20230113-084337?w=940&auto=format%2Ccompress&q=75&sharp=10&s=62224c76edc2233694986a41066ebe2f",
                 "capacity": 100,
-                "date": fake.date_time_between(start_date='now', end_date='+5d', tzinfo=timezone.utc),
+                "date": fake.date_time_between(start_date='now', end_date='+115d', tzinfo=timezone.utc),
                 "sponsor": sponsor2
             },
             {
@@ -203,7 +203,7 @@ class Command(BaseCommand):
                 "age_limit": "18+",
                 "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F192974469%2F124429251107%2F1%2Foriginal.20211129-000629?w=940&auto=format%2Ccompress&q=75&sharp=10&rect=0%2C83%2C794%2C397&s=6a7d05d396a86a7d5f27aca6cff06222",
                 "capacity": 200,
-                "date": fake.date_time_between(start_date='now', end_date='+50d', tzinfo=timezone.utc),
+                "date": fake.date_time_between(start_date='now', end_date='+250d', tzinfo=timezone.utc),
                 "sponsor": sponsor2
             },
             {
@@ -216,7 +216,7 @@ class Command(BaseCommand):
                 "location": "Brookhaven Gardens, Nairobi",
                 "age_limit": "26+",
                 "image": "https://media.istockphoto.com/id/1913125761/photo/silhouettes-of-people-dancing-and-rising-hands-at-open-air-summer-festival.jpg?s=612x612&w=0&k=20&c=HqEoqMCPEyOR4uhOnc03sDONY267HJqwXcqTMZjqqPw=",
-                "date": fake.date_time_between(start_date='now', end_date='+5d', tzinfo=timezone.utc),
+                "date": fake.date_time_between(start_date='now', end_date='+335d', tzinfo=timezone.utc),
                 "sponsor": sponsor2,
                 "capacity": 500
             },
@@ -231,7 +231,7 @@ class Command(BaseCommand):
                 "location": "Paradise Gardens, Nairobi",
                 "age_limit": "18+",
                 "capacity": 500,
-                "date": fake.date_time_between(start_date='now', end_date='+25d', tzinfo=timezone.utc),
+                "date": fake.date_time_between(start_date='now', end_date='+250d', tzinfo=timezone.utc),
                 "sponsor": sponsor2
             },
             {
@@ -245,7 +245,7 @@ class Command(BaseCommand):
                 "location": "Sweet Memories Gardens, Nairobi",
                 "age_limit": "16+",
                 "capacity": 5500,
-                "date": fake.date_time_between(start_date='now', end_date='+25d', tzinfo=timezone.utc),
+                "date": fake.date_time_between(start_date='now', end_date='+250d', tzinfo=timezone.utc),
                 "sponsor": sponsor2
             },
             {
@@ -259,7 +259,7 @@ class Command(BaseCommand):
                 "location": "The Carnivore Grounds, Nairobi",
                 "age_limit": "25+",
                 "capacity": 55500,
-                "date": fake.date_time_between(start_date='now', end_date='+25d', tzinfo=timezone.utc),
+                "date": fake.date_time_between(start_date='now', end_date='+250d', tzinfo=timezone.utc),
                 "sponsor": sponsor2
                 
             },
@@ -274,7 +274,7 @@ class Command(BaseCommand):
                 "location": "Paco Thrill Haven, Naivasha",
                 "age_limit": "25+",
                 "capacity": 55500,
-                "date": fake.date_time_between(start_date='now', end_date='+25d', tzinfo=timezone.utc),
+                "date": fake.date_time_between(start_date='+50d', end_date='+250d', tzinfo=timezone.utc),
                 "sponsor": sponsor2
         
             },
@@ -287,9 +287,9 @@ class Command(BaseCommand):
                 "image": "https://images.unsplash.com/photo-1613244665771-e8a2af4214af?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTF8fGJyYWFpfGVufDB8fDB8fHww",
                 "description": "l'Equipe Choque Presents. The Sunday Braai\n- Where South and West African food meet -\n\nLadies and gentlemen we present to you the THIRD iteration of The Sunday Braai, after the overwhelming success of the last edition we invite you to join us on the 16th of July as we fire up our grills, stock up our bar and press play on a fantastic Sunday.",
                 "location": " Village Market",
-                "age_limit": "15+",
+                "age_limit": "16+",
                 "capacity": 100,
-                "date": fake.date_time_between(start_date='now', end_date='+25d', tzinfo=timezone.utc),
+                "date": fake.date_time_between(start_date='+50d', end_date='+200d', tzinfo=timezone.utc),
                 "sponsor": sponsor2
             },
             {
@@ -298,12 +298,12 @@ class Command(BaseCommand):
                 "event_planner_name": 'Jessy Waweru',
                 "event_planner_contact": '0703261126',
                 "title": "Afro-Coustic with Atemi Oyungu",
-                "image": "https://plus.unsplash.com/premium_photo-1705351823609-deec7d4ef58f?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8YWZybyUyMG11c2ljfGVufDB8fDB8fHww",
+                "image": "https://images.unsplash.com/photo-1553892513-53c40bbcba93?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8YWZybyUyMG11c2ljfGVufDB8fDB8fHww",
                 "description": "This lovely event dubbed Afro-coustic will feature Atemi alongside talented artists Lisa Oduor-Noah, Kendi Nkonge, and Manasseh Shalom. Experience a preview of Atemi's new music and enjoy her beloved songs from her extensive catalog..",
                 "location": " Sax & Violins Lounge, Karen",
                 "age_limit": "25+",
                 "capacity": 500,
-                "date": fake.date_time_between(start_date='now', end_date='+25d', tzinfo=timezone.utc),
+                "date": fake.date_time_between(start_date='+50d', end_date='+200d', tzinfo=timezone.utc),
                 "sponsor": sponsor2
         
     }

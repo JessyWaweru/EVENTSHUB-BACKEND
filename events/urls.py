@@ -19,4 +19,4 @@ urlpatterns = [
     # e.g., /api/users/, /api/events/, etc.
     path('', include(router.urls)),
     path('movies/', KenyaBuzzMoviesView.as_view(), name='movie-showtimes'),
-]
+] 

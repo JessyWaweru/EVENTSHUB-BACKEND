@@ -76,3 +76,21 @@ class Attendee(models.Model):
 
     def __str__(self):
         return self.name
+    
+
+class Cinema(models.Model):
+    name = models.CharField(max_length=255) # e.g., "Century Cinemax Sarit Centre"
+    location = models.CharField(max_length=255) # e.g., "Westlands, Nairobi"
+
+    def __str__(self):
+        return self.name
+
+class Showtime(models.Model):
+    movie = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='showtimes')
+    cinema = models.ForeignKey(Cinema, on_delete=models.CASCADE, related_name='showtimes')
+    date = models.DateField() # e.g., 2026-03-24
+    time = models.TimeField() # e.g., 14:30:00
+    ticket_link = models.URLField(max_length=500, blank=True, null=True) # The actual KenyaBuzz checkout link!
+
+    def __str__(self):
+        return f"{self.movie.title} at {self.cinema.name} - {self.time}"    

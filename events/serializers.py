@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User, Sponsor, Event, Speaker, Attendee
+from .models import User, Sponsor, Event, Speaker, Attendee, Cinema, Showtime
 
 
 # ===========================
@@ -30,10 +30,30 @@ class AttendeeSerializer(serializers.ModelSerializer):
         model = Attendee
         fields = '__all__'
 
+# --- NEW SERIALIZERS FOR SCHEDULES ---
+
+class CinemaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Cinema
+        fields = '__all__'
+
+class ShowtimeSerializer(serializers.ModelSerializer):
+    # This nests the full cinema details inside the showtime
+    # so React gets the cinema name and location without doing extra API calls!
+    cinema = CinemaSerializer(read_only=True) 
+
+    class Meta:
+        model = Showtime
+        fields = ['id', 'date', 'time', 'ticket_link', 'cinema']
+
+# -------------------------------------
+
 class EventSerializer(serializers.ModelSerializer):
-    # If you want nested data (e.g., seeing speaker details inside the event), 
-    # you can uncomment the lines below:
-    # speakers = SpeakerSerializer(many=True, read_only=True)
+    # This automatically grabs all showtimes linked to this movie 
+    # (using the related_name='showtimes' we set in models.py)
+    showtimes = ShowtimeSerializer(many=True, read_only=True)
+    
+    # Optional: If you want to see sponsor details nested, uncomment this:
     # sponsor = SponsorSerializer(read_only=True)
 
     class Meta:
